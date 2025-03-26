@@ -58,7 +58,6 @@ class CuisineViewModel @Inject constructor(
         _uiState.update { it.copy(error = null) }
     }
 
-
 }
 
 data class UiState(

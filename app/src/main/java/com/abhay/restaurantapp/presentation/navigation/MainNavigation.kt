@@ -84,7 +84,8 @@ fun MainNavigation(
                     homeViewModel.removeItemFromCart(it)
                 },
                 onShowSnackbar = onShowSnackbar,
-                clearError = { homeViewModel.clearError() }
+                clearError = { homeViewModel.clearError() },
+                getMoreCuisine = { homeViewModel.getMoreCuisines() }
             )
         }
 
@@ -103,7 +104,8 @@ fun MainNavigation(
                     homeViewModel.removeItemFromCart(it)
                 },
                 onShowSnackbar = onShowSnackbar,
-                clearError = { viewModel.clearError() }
+                clearError = { viewModel.clearError() },
+                getMoreItems = { viewModel.getItemList(args.id) }
             )
         }
 

@@ -31,10 +31,14 @@ class HomeViewModel @Inject constructor(
         getTopItems()
     }
 
+    private var page = 1
+    private var count = 10
+
     private fun getItemList() {
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch(Dispatchers.IO) {
             val resource = foodRepository.getItemList(1, 10)
+            page += 2
             _uiState.update {
                 when (resource) {
                     is Resource.Success<*> -> it.copy(
@@ -44,6 +48,24 @@ class HomeViewModel @Inject constructor(
                     is Resource.Error<*> -> it.copy(
                         error = resource.message,
                         isLoading = false
+                    )
+                }
+            }
+            Log.d("HomeViewModel", "getItemList: ${uiState.value}")
+        }
+    }
+
+    fun getMoreCuisines() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val resource = foodRepository.getItemList(page, count)
+            page += 2
+            _uiState.update {
+                when (resource) {
+                    is Resource.Success<*> -> it.copy(
+                        cuisine = it.cuisine + resource.data!!.cuisines
+                    )
+                    is Resource.Error<*> -> it.copy(
+                        error = resource.message
                     )
                 }
             }
