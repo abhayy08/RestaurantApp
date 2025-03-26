@@ -1,9 +1,12 @@
 package com.abhay.restaurantapp.presentation.cart
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.abhay.restaurantapp.data.api.PaymentItem
 import com.abhay.restaurantapp.domain.CartItem
 import com.abhay.restaurantapp.domain.FoodRepository
+import com.abhay.restaurantapp.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -34,20 +37,48 @@ class CheckoutViewModel @Inject constructor(
         val cgst = netTotal * 0.025
         val sgst = netTotal * 0.025
         val grandTotal = netTotal + cgst + sgst
+        val roundedGrandTotal = String.format("%.2f", grandTotal).toDouble()
 
         _cartState.value = _cartState.value.copy(
-            netTotalAmount = netTotal,
-            grandTotalAmount = grandTotal,
-            isLoading = false
+            netTotalAmount = netTotal, grandTotalAmount = roundedGrandTotal, isLoading = false
         )
     }
 
-    fun checkout() {
+    fun checkout(openDialog: (String, String) -> Unit) {
         viewModelScope.launch {
+            val paymentItems = _cartState.value.items.map { cartItem ->
+                PaymentItem(
+                    cuisineId = cartItem.cuisineId.toInt(),
+                    itemId = cartItem.item.id.toInt(),
+                    itemPrice = cartItem.item.price.toDouble(),
+                    itemQuantity = cartItem.quantity
+                )
+            }
+            Log.d("CheckoutViewModel", "checkout: $paymentItems")
+            val resource = foodRepository.makePayment(
+                totalAmount = _cartState.value.grandTotalAmount.toString(),
+                totalItems = _cartState.value.items.size,
+                paymentItems = paymentItems
+            )
+            when (resource) {
+                is Resource.Error<*> -> {
+                    _cartState.value = _cartState.value.copy(
+                        error = resource.message
+                    )
+                }
 
+                is Resource.Success<*> -> {
+                    Log.d("CheckoutViewModel", "checkout: ${resource.data!!.responseMessage}")
+                    openDialog(
+                        resource.data!!.transactionReferenceNumber,
+                        resource.data.responseMessage
+                    )
+                }
+            }
         }
     }
 }
+
 
 
 data class CartState(

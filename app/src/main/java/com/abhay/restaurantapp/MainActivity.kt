@@ -54,7 +54,7 @@ fun RestaurantMainScreen(navController: NavHostController) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
-            RestaurantTopAppBar(currentScreenTitle = currentScreenTitle)
+            RestaurantTopAppBar(currentScreenTitle = if(currentScreenTitle.startsWith("Dialog")) "Checkout" else currentScreenTitle)
         },
         floatingActionButton = {
             CartFab(

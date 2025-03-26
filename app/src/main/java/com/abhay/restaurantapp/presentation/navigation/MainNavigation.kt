@@ -6,15 +6,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.dialog
 import androidx.navigation.toRoute
 import com.abhay.restaurantapp.presentation.cart.CheckoutScreen
 import com.abhay.restaurantapp.presentation.cart.CheckoutViewModel
 import com.abhay.restaurantapp.presentation.cuisine.CuisineScreen
 import com.abhay.restaurantapp.presentation.cuisine.CuisineViewModel
+import com.abhay.restaurantapp.presentation.dialog.DialogBox
 import com.abhay.restaurantapp.presentation.home.HomeScreen
 import com.abhay.restaurantapp.presentation.home.HomeViewModel
 import com.abhay.restaurantapp.presentation.menu.MenuScreen
@@ -100,10 +103,32 @@ fun MainNavigation(
             CheckoutScreen(
                 cartState = cartState,
                 onCheckOut = {
-
+                    viewModel.checkout(
+                        openDialog = { transactionId, message ->
+                            navController.navigate(Dialog(transactionId, message))
+                        }
+                    )
                 }
             )
         }
+
+
+        dialog<Dialog>(
+            dialogProperties = DialogProperties(
+                dismissOnBackPress = false,
+                dismissOnClickOutside = false
+            )
+        ) {
+            val args = it.toRoute<Dialog>()
+            DialogBox(
+                transactionId = args.transactionId,
+                message = args.message,
+                popBackStack = {
+                    navController.popBackStack(Home, false)
+                }
+            )
+        }
+
     }
 }
 
@@ -115,6 +140,9 @@ data class Cuisine(val id: String)
 
 @Serializable
 data object Menu
+
+@Serializable
+data class Dialog(val transactionId: String, val message: String)
 
 @Serializable
 data object CheckOut
