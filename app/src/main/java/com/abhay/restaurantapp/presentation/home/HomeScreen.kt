@@ -30,7 +30,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
@@ -45,11 +44,15 @@ fun HomeScreen(
     onCuisineClick: (String) -> Unit = {},
     onAddItem: (MenuItem) -> Unit = {},
     onRemoveItem: (MenuItem) -> Unit = {},
-    onShowSnackbar: (String) -> Unit = {}
+    onShowSnackbar: (String) -> Unit = {},
+    clearError: () -> Unit
 ) {
 
     LaunchedEffect(uiState.error) {
-        onShowSnackbar(uiState.error ?: "An unknow error occured")
+        uiState.error?.let {
+            onShowSnackbar(uiState.error)
+            clearError()
+        }
     }
 
 
@@ -102,15 +105,26 @@ fun HomeScreen(
                         textAlign = TextAlign.Center
                     )
 
-                    uiState.topItems.forEach {menuItem ->
-                        val item = uiState.cart.find { it.item.id == menuItem.id }
-                        DishItem(
-                            modifier = Modifier.fillMaxWidth(0.9f),
-                            dish = menuItem,
-                            onAddItem = onAddItem,
-                            onRemoveItem = onRemoveItem,
-                            currentCountInCart = item?.quantity ?: 0
-                        )
+                    if(!uiState.isTopItemsLoading){
+                        uiState.topItems.forEach {menuItem ->
+                            val item = uiState.cart.find { it.item.id == menuItem.id }
+                            DishItem(
+                                modifier = Modifier.fillMaxWidth(0.9f),
+                                dish = menuItem,
+                                onAddItem = onAddItem,
+                                onRemoveItem = onRemoveItem,
+                                currentCountInCart = item?.quantity ?: 0
+                            )
+                        }
+                    }else {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(300.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
                     }
                 }
             }
@@ -156,17 +170,4 @@ fun CuisineCard(
             )
         }
     }
-}
-
-@Preview
-@Composable
-private fun CuisineCardPreview() {
-//    CuisineCard()
-}
-
-
-@Preview
-@Composable
-private fun HomeScreenPreview() {
-    HomeScreen()
 }

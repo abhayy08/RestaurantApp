@@ -1,38 +1,43 @@
 package com.abhay.restaurantapp.presentation.cuisine
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.abhay.restaurantapp.data.api.MenuItem
 import com.abhay.restaurantapp.presentation.common.DishItem
 
 @Composable
 fun CuisineScreen(
     state: UiState,
-    onAddItem: (MenuItem) -> Unit = {},
-    onRemoveItem: (MenuItem) -> Unit = {},
-    onShowSnackbar: (String) -> Unit = {},
-    onPopBack: () -> Boolean
+    onAddItem: (MenuItem) -> Unit,
+    onRemoveItem: (MenuItem) -> Unit,
+    onShowSnackbar: (String) -> Unit,
+    clearError: () -> Unit
 ) {
 
     LaunchedEffect(state.error) {
-        onShowSnackbar(state.error ?: "An unknow error occured")
+        state.error?.let {
+            onShowSnackbar(state.error)
+            clearError()
+        }
     }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        LazyColumn {
-            items(state.cuisineItems) {menuItem ->
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(8.dp)
+        ) {
+            items(state.cuisineItems) { menuItem ->
                 val item = state.cart?.find { it.item.id == menuItem.id }
                 DishItem(
                     dish = menuItem,

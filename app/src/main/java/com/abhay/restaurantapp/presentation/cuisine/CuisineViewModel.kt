@@ -35,7 +35,12 @@ class CuisineViewModel @Inject constructor(
             val resource = foodRepository.getItemList(1, 10)
             when (resource) {
                 is Resource.Success<*> -> {
-                    _uiState.update { it.copy(cuisineItems = resource.data!!.cuisines.find { it.cuisineId == cuisineId }!!.items, isLoading = false) }
+                    _uiState.update {
+                        it.copy(
+                            cuisineItems = resource.data!!.cuisines.find { it.cuisineId == cuisineId }!!.items,
+                            isLoading = false
+                        )
+                    }
                     Log.d("CuisineViewModel", "getItemList: ${uiState.value}")
                 }
 
@@ -48,6 +53,11 @@ class CuisineViewModel @Inject constructor(
         }
 
     }
+
+    fun clearError() {
+        _uiState.update { it.copy(error = null) }
+    }
+
 
 }
 

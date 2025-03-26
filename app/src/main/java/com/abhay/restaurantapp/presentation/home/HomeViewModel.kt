@@ -32,55 +32,52 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun getItemList() {
-        _uiState.value = _uiState.value.copy(isLoading = true)
+        _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch(Dispatchers.IO) {
             val resource = foodRepository.getItemList(1, 10)
-            when (resource) {
-                is Resource.Success<*> -> {
-                    _uiState.update {
-                        it.copy(
-                            cuisine = resource.data!!.cuisines,
-                            isLoading = false
-                        )
-                    }
-                    Log.d("HomeViewModel", "getItemList: ${uiState.value}")
-                }
-
-                is Resource.Error<*> -> {
-                    _uiState.update { it.copy(error = resource.message, isLoading = false) }
+            _uiState.update {
+                when (resource) {
+                    is Resource.Success<*> -> it.copy(
+                        cuisine = resource.data!!.cuisines,
+                        isLoading = false
+                    )
+                    is Resource.Error<*> -> it.copy(
+                        error = resource.message,
+                        isLoading = false
+                    )
                 }
             }
-
+            Log.d("HomeViewModel", "getItemList: ${uiState.value}")
         }
     }
 
     private fun getTopItems() {
-        _uiState.value = _uiState.value.copy(isLoading = true)
+        _uiState.update { it.copy(isTopItemsLoading = true) }
         viewModelScope.launch(Dispatchers.IO) {
             val resource = foodRepository.getItemByFilter(null, null, 4.0)
-            when (resource) {
-                is Resource.Success<*> -> {
-                    val topItems = getTopItemsInDetail(resource.data!!.cuisines[0].items.take(3))
-                    _uiState.update {
+            _uiState.update {
+                when (resource) {
+                    is Resource.Success<*> -> {
+                        val topItems = getTopItemsInDetail(resource.data!!.cuisines[0].items.take(3))
                         it.copy(
                             topItems = topItems,
                             cuisineIdofTopItems = resource.data.cuisines[0].cuisineId,
-                            isLoading = false)
+                            isTopItemsLoading = false
+                        )
                     }
-                    Log.d("HomeViewModel", "getTopItems:ItemList: ${uiState.value.topItems}")
-                }
-
-                is Resource.Error<*> -> {
-                    _uiState.update { it.copy(error = resource.message, isLoading = false) }
+                    is Resource.Error<*> -> it.copy(
+                        error = resource.message,
+                        isTopItemsLoading = false
+                    )
                 }
             }
-
+            Log.d("HomeViewModel", "getTopItems:ItemList: ${uiState.value.topItems}")
         }
     }
 
     suspend fun getTopItemsInDetail(items: List<MenuItem>): MutableList<MenuItem> {
         val resultList = mutableListOf<MenuItem>()
-        items.forEach { item ->
+        for (item in items) {
             val resource = foodRepository.getItemById(item.id.toInt())
             when (resource) {
                 is Resource.Success<*> -> {
@@ -92,14 +89,12 @@ class HomeViewModel @Inject constructor(
                                 imageUrl = itemDetail.itemImageUrl,
                                 price = itemDetail.itemPrice.toString(),
                                 rating = itemDetail.itemRating.toString()
-
                             )
                         )
                     }
                 }
-
                 is Resource.Error<*> -> {
-                    _uiState.update { it.copy(error = resource.message, isLoading = false) }
+                    _uiState.update { it.copy(error = resource.message) }
                 }
             }
         }
@@ -110,16 +105,14 @@ class HomeViewModel @Inject constructor(
         val currentCart = _uiState.value.cart.toMutableList()
         val existingCartItemIndex = currentCart.indexOfFirst { it.item.id == menuItem.id }
 
-        Log.d("HomeViewModel", "addItemToCart: ${currentCart}")
+        Log.d("HomeViewModel", "addItemToCart: $currentCart")
         if (existingCartItemIndex != -1) {
             val existingCartItem = currentCart[existingCartItemIndex]
-            val updatedCartItem = existingCartItem.copy(quantity = existingCartItem.quantity + 1)
-            currentCart[existingCartItemIndex] = updatedCartItem
+            currentCart[existingCartItemIndex] = existingCartItem.copy(quantity = existingCartItem.quantity + 1)
         } else {
             currentCart.add(CartItem(item = menuItem, cuisineId = cuisineId, quantity = 1))
         }
         _uiState.update { it.copy(cart = currentCart) }
-
     }
 
     fun removeItemFromCart(menuItem: MenuItem) {
@@ -133,13 +126,13 @@ class HomeViewModel @Inject constructor(
             if (existingCartItem.quantity == 1) {
                 currentCart.removeAt(existingCartItemIndex)
             } else {
-                val updatedCartItem =
-                    existingCartItem.copy(quantity = existingCartItem.quantity - 1)
-                currentCart[existingCartItemIndex] = updatedCartItem
+                currentCart[existingCartItemIndex] = existingCartItem.copy(quantity = existingCartItem.quantity - 1)
             }
             _uiState.update { it.copy(cart = currentCart) }
         }
-
+    }
+    fun clearError() {
+        _uiState.update { it.copy(error = null) }
     }
 
 }
@@ -148,6 +141,7 @@ data class UiState(
     val cuisine: List<Cuisine> = emptyList(),
     val topItems: List<MenuItem> = emptyList(),
     val isLoading: Boolean = false,
+    val isTopItemsLoading: Boolean = false,
     val error: String? = null,
     val cart: List<CartItem> = emptyList(),
     val cuisineIdofTopItems: String = ""

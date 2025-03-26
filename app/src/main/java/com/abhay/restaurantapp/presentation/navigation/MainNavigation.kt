@@ -29,7 +29,8 @@ import kotlinx.serialization.Serializable
 @Composable
 fun MainNavigation(
     navController: NavHostController,
-    paddValues: PaddingValues
+    paddingValues: PaddingValues,
+    onShowSnackbar: (String) -> Unit = { message -> }
 ) {
     val homeViewModel = hiltViewModel<HomeViewModel>()
     val cartItems = homeViewModel.uiState.collectAsState().value.cart
@@ -38,7 +39,7 @@ fun MainNavigation(
         startDestination = Home,
         modifier = Modifier
             .fillMaxSize()
-            .padding(paddValues),
+            .padding(paddingValues),
         enterTransition = {
             slideInHorizontally(
                 initialOffsetX = { it },
@@ -47,11 +48,24 @@ fun MainNavigation(
         },
         exitTransition = {
             slideOutHorizontally(
+                targetOffsetX = { -it },
+                animationSpec = tween(500)
+            )
+        },
+        popEnterTransition = {
+            slideInHorizontally(
+                initialOffsetX = { -it },
+                animationSpec = tween(500)
+            )
+        },
+        popExitTransition = {
+            slideOutHorizontally(
                 targetOffsetX = { it },
                 animationSpec = tween(500)
             )
         }
-    ) {
+    )
+    {
         composable<Home> {
             val state = homeViewModel.uiState.collectAsState().value
             HomeScreen(
@@ -68,7 +82,9 @@ fun MainNavigation(
                 },
                 onRemoveItem = {
                     homeViewModel.removeItemFromCart(it)
-                }
+                },
+                onShowSnackbar = onShowSnackbar,
+                clearError = { homeViewModel.clearError() }
             )
         }
 
@@ -86,9 +102,8 @@ fun MainNavigation(
                 onRemoveItem = {
                     homeViewModel.removeItemFromCart(it)
                 },
-                onPopBack = {
-                    navController.popBackStack()
-                }
+                onShowSnackbar = onShowSnackbar,
+                clearError = { viewModel.clearError() }
             )
         }
 
@@ -123,7 +138,9 @@ fun MainNavigation(
                             navController.navigate(Dialog(transactionId, message))
                         }
                     )
-                }
+                },
+                onShowSnackbar = onShowSnackbar,
+                clearError = { viewModel.clearError() }
             )
         }
 

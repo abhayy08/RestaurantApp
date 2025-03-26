@@ -4,9 +4,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
-
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ShoppingCart
@@ -15,10 +16,14 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -28,6 +33,7 @@ import com.abhay.restaurantapp.presentation.navigation.MainNavigation
 import com.abhay.restaurantapp.presentation.navigation.Menu
 import com.abhay.restaurantapp.ui.theme.RestaurantAppTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -50,20 +56,32 @@ fun RestaurantMainScreen(navController: NavHostController) {
     val currentScreenTitle =
         currentDestination.toString().substringAfterLast('.').substringBeforeLast('/')
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
-            RestaurantTopAppBar(currentScreenTitle = if(currentScreenTitle.startsWith("Dialog")) "Checkout" else currentScreenTitle)
+            RestaurantTopAppBar(currentScreenTitle = if (currentScreenTitle.startsWith("Dialog")) "Checkout" else currentScreenTitle)
         },
         floatingActionButton = {
             CartFab(
                 navController = navController,
                 isVisible = !(currentScreenTitle == "CheckOut" || currentScreenTitle == "Menu")
             )
+        },
+        snackbarHost = {
+            SnackbarHost(snackbarHostState)
         }
-    ) { paddValues ->
-        MainNavigation(navController, paddValues)
+    ) { paddingValues ->
+        MainNavigation(
+            navController = navController,
+            paddingValues = paddingValues,
+            onShowSnackbar = {message ->
+                scope.launch { snackbarHostState.showSnackbar(message) }
+            }
+        )
     }
 }
 
@@ -84,7 +102,8 @@ fun CartFab(
             targetOffsetX = { it },
             animationSpec = tween(
                 durationMillis = 500
-            ))
+            )
+        )
     ) {
         FloatingActionButton(
             onClick = {

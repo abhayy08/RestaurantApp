@@ -11,6 +11,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -28,7 +29,6 @@ class CheckoutViewModel @Inject constructor(
     }
 
     fun calculateTotalAmount() {
-        _cartState.value = _cartState.value.copy(isLoading = true)
         val cartItems = _cartState.value.items
         var netTotal = 0.0
         cartItems.forEach { (menuItem, _, quantity) ->
@@ -40,11 +40,12 @@ class CheckoutViewModel @Inject constructor(
         val roundedGrandTotal = String.format("%.2f", grandTotal).toDouble()
 
         _cartState.value = _cartState.value.copy(
-            netTotalAmount = netTotal, grandTotalAmount = roundedGrandTotal, isLoading = false
+            netTotalAmount = netTotal, grandTotalAmount = roundedGrandTotal
         )
     }
 
     fun checkout(openDialog: (String, String) -> Unit) {
+        _cartState.value = _cartState.value.copy(isPaymentLoading = true)
         viewModelScope.launch {
             val paymentItems = _cartState.value.items.map { cartItem ->
                 PaymentItem(
@@ -63,29 +64,32 @@ class CheckoutViewModel @Inject constructor(
             when (resource) {
                 is Resource.Error<*> -> {
                     _cartState.value = _cartState.value.copy(
-                        error = resource.message
+                        error = resource.message, isPaymentLoading = false
                     )
                 }
 
                 is Resource.Success<*> -> {
                     Log.d("CheckoutViewModel", "checkout: ${resource.data!!.responseMessage}")
+                    _cartState.value = _cartState.value.copy(isPaymentLoading = false)
                     openDialog(
-                        resource.data!!.transactionReferenceNumber,
-                        resource.data.responseMessage
+                        resource.data!!.transactionReferenceNumber, resource.data.responseMessage
                     )
                 }
             }
         }
     }
-}
 
+    fun clearError() {
+        _cartState.update { it.copy(error = null) }
+    }
+
+}
 
 
 data class CartState(
     val netTotalAmount: Double = 0.0,
     val grandTotalAmount: Double = 0.0,
     val items: List<CartItem> = emptyList(),
-    val isLoading: Boolean = false,
     val error: String? = null,
     val isPaymentLoading: Boolean = false
 )

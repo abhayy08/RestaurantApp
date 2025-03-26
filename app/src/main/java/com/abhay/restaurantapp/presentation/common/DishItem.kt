@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Remove
@@ -89,8 +88,7 @@ fun DishItem(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "₹${dish.price}",
-                        style = MaterialTheme.typography.bodySmall
+                        text = "₹${dish.price}", style = MaterialTheme.typography.bodySmall
                     )
 
                     Text(
@@ -109,31 +107,24 @@ fun DishItem(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 IconButton(
-                    onClick = { onRemoveItem(dish) }
-                ) {
+                    onClick = { onRemoveItem(dish) }) {
                     Icon(
-                        imageVector = Icons.Rounded.Remove,
-                        contentDescription = "Remove Item"
+                        imageVector = Icons.Rounded.Remove, contentDescription = "Remove Item"
                     )
                 }
                 Text(
-                    text = currentCountInCart.toString(),
-                    modifier = Modifier.padding(8.dp)
+                    text = currentCountInCart.toString(), modifier = Modifier.padding(8.dp)
                 )
                 IconButton(
-                    onClick = { onAddItem(dish) }
-                ) {
+                    onClick = { onAddItem(dish) }) {
                     Icon(
-                        imageVector = Icons.Rounded.Add,
-                        contentDescription = "Remove Item"
+                        imageVector = Icons.Rounded.Add, contentDescription = "Remove Item"
                     )
                 }
             }
         } else {
             Button(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = { onAddItem(dish) }
-            ) {
+                modifier = Modifier.fillMaxWidth(), onClick = { onAddItem(dish) }) {
                 Text(stringResource(R.string.add_item_to_cart))
             }
         }

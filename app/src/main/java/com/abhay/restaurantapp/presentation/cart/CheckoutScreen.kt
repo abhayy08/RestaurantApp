@@ -1,5 +1,6 @@
 package com.abhay.restaurantapp.presentation.cart
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,10 +11,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,12 +27,19 @@ import com.abhay.restaurantapp.domain.CartItem
 
 @Composable
 fun CheckoutScreen(
-    cartState: CartState,
-    onCheckOut: () -> Unit = {}
+    cartState: CartState, onCheckOut: () -> Unit,
+    onShowSnackbar: (String) -> Unit,
+    clearError: () -> Unit
 ) {
+
+    LaunchedEffect(cartState.error) {
+        cartState.error?.let {
+            onShowSnackbar(cartState.error)
+            clearError()
+        }
+    }
     Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+        modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
     ) {
         Column(
             modifier = Modifier
@@ -38,8 +48,7 @@ fun CheckoutScreen(
         ) {
             cartState.items.forEach { item ->
                 CheckoutItem(
-                    modifier = Modifier.padding(vertical = 4.dp),
-                    cartItem = item
+                    modifier = Modifier.padding(vertical = 4.dp), cartItem = item
                 )
             }
 
@@ -52,12 +61,13 @@ fun CheckoutScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(stringResource(R.string.total), modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f))
+                Text(
+                    stringResource(R.string.total), modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                )
                 Row(
-                    modifier = Modifier.weight(1f),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(text = stringResource(R.string.unique_items) + "${cartState.items.size}")
                     Text(
@@ -72,11 +82,19 @@ fun CheckoutScreen(
             modifier = Modifier
                 .fillMaxWidth(0.9f)
                 .align(Alignment.BottomCenter)
-                .padding(bottom = 16.dp),
-            onClick = onCheckOut,
-            shape = RoundedCornerShape(4.dp)
+                .padding(bottom = 16.dp), onClick = onCheckOut, shape = RoundedCornerShape(4.dp)
         ) {
             Text(text = stringResource(R.string.order_now))
+        }
+        if (cartState.isPaymentLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.5f)),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
         }
     }
 
@@ -84,8 +102,7 @@ fun CheckoutScreen(
 
 @Composable
 fun CheckoutItem(
-    modifier: Modifier = Modifier,
-    cartItem: CartItem
+    modifier: Modifier = Modifier, cartItem: CartItem
 ) {
     Card(
         modifier = modifier

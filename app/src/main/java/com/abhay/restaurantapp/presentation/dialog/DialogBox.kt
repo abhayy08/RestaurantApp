@@ -38,7 +38,7 @@ fun DialogBox(
     var showThumbsUp by remember { mutableStateOf(false) }
     var showMessage by remember { mutableStateOf(false) }
 
-    LaunchedEffect(key1 = Unit){
+    LaunchedEffect(key1 = Unit) {
         delay(200)
         showMessage = true
         showThumbsUp = true
@@ -47,7 +47,9 @@ fun DialogBox(
     }
 
     Card(
-        modifier = modifier.height(200.dp).width(500.dp)
+        modifier = modifier
+            .height(200.dp)
+            .width(500.dp)
     ) {
         Column(
             modifier = Modifier
@@ -61,7 +63,11 @@ fun DialogBox(
                 enter = fadeIn(animationSpec = tween(500)),
                 exit = fadeOut(animationSpec = tween(500))
             ) {
-                Icon(imageVector = Icons.Rounded.ThumbUp, contentDescription = "Thumbs Up", modifier = Modifier.size(100.dp))
+                Icon(
+                    imageVector = Icons.Rounded.ThumbUp,
+                    contentDescription = "Thumbs Up",
+                    modifier = Modifier.size(100.dp)
+                )
             }
             AnimatedVisibility(
                 visible = showMessage,
