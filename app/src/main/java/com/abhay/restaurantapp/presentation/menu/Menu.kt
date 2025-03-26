@@ -23,7 +23,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,7 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.abhay.restaurantapp.R
-import com.abhay.restaurantapp.domain.CartItem
+import com.abhay.restaurantapp.domain.model.CartItem
 
 @Composable
 fun MenuScreen(
@@ -40,18 +39,11 @@ fun MenuScreen(
     onAddItem: (CartItem) -> Unit = {},
     onRemoveItem: (CartItem) -> Unit = {},
     onProceedToCheckout: () -> Unit = {},
-    onPopBack: () -> Unit = {}
 ) {
-
-    LaunchedEffect(cart.size) {
-        if(cart.isEmpty()) {
-            onPopBack()
-        }
-    }
 
     Box(
         modifier = Modifier.fillMaxSize(),
-    ){
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -94,8 +86,7 @@ fun MenuItemCard(
         modifier = modifier
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row {
                 Image(
@@ -106,24 +97,19 @@ fun MenuItemCard(
                         .aspectRatio(1f),
                     contentScale = ContentScale.Crop
                 )
-                Column (
+                Column(
                     modifier = Modifier.padding(4.dp)
-                ){
+                ) {
                     Text(text = item.item.name, style = MaterialTheme.typography.titleMedium)
                     Text(text = item.item.price, color = Color.Gray)
                 }
             }
 
-            MenuQuantityButton(
-                dish = item,
-                currentCountInCart = item.quantity,
-                onAddItem = {
-                    onAddItem(it)
-                },
-                onRemoveItem = {
-                    onRemoveItem(it)
-                }
-            )
+            MenuQuantityButton(dish = item, currentCountInCart = item.quantity, onAddItem = {
+                onAddItem(it)
+            }, onRemoveItem = {
+                onRemoveItem(it)
+            })
         }
     }
 }
@@ -142,23 +128,18 @@ fun MenuQuantityButton(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         IconButton(
-            onClick = { onRemoveItem(dish) }
-        ) {
+            onClick = { onRemoveItem(dish) }) {
             Icon(
-                imageVector = Icons.Rounded.Remove,
-                contentDescription = "Remove Item"
+                imageVector = Icons.Rounded.Remove, contentDescription = "Remove Item"
             )
         }
         Text(
-            text = currentCountInCart.toString(),
-            modifier = Modifier.padding(8.dp)
+            text = currentCountInCart.toString(), modifier = Modifier.padding(8.dp)
         )
         IconButton(
-            onClick = { onAddItem(dish) }
-        ) {
+            onClick = { onAddItem(dish) }) {
             Icon(
-                imageVector = Icons.Rounded.Add,
-                contentDescription = "Remove Item"
+                imageVector = Icons.Rounded.Add, contentDescription = "Remove Item"
             )
         }
     }

@@ -24,8 +24,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Alignment
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -36,14 +36,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.abhay.restaurantapp.R
-import com.abhay.restaurantapp.data.api.Cuisine
-import com.abhay.restaurantapp.data.api.MenuItem
+import com.abhay.restaurantapp.data.api.dto.Cuisine
+import com.abhay.restaurantapp.data.api.dto.MenuItem
 import com.abhay.restaurantapp.presentation.common.DishItem
 
 @Composable
 fun HomeScreen(
     uiState: UiState = UiState(),
-    onCuisineClick: (String, String) -> Unit = {id, name -> },
+    onCuisineClick: (String, String) -> Unit = { id, name -> },
     onAddItem: (MenuItem) -> Unit = {},
     onRemoveItem: (MenuItem) -> Unit = {},
     onShowSnackbar: (String) -> Unit = {},
@@ -53,7 +53,7 @@ fun HomeScreen(
 
     LaunchedEffect(uiState.error) {
         uiState.error?.let {
-            onShowSnackbar(if(uiState.error.isEmpty()) "Something went wrong" else uiState.error)
+            onShowSnackbar(if (uiState.error.isEmpty()) "Something went wrong" else uiState.error)
             clearError()
         }
     }
@@ -64,24 +64,22 @@ fun HomeScreen(
     }
 
     LaunchedEffect(isLastElementVisible) {
-        if(isLastElementVisible) {
+        if (isLastElementVisible) {
             getMoreCuisines()
         }
     }
 
 
     Surface(
-        color = MaterialTheme.colorScheme.background,
-        modifier = Modifier.fillMaxSize()
+        color = MaterialTheme.colorScheme.background, modifier = Modifier.fillMaxSize()
     ) {
-        if(uiState.isLoading) {
+        if (uiState.isLoading) {
             Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+                modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator()
             }
-        }else {
+        } else {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -89,20 +87,19 @@ fun HomeScreen(
                     .verticalScroll(rememberScrollState()),
             ) {
                 Text(
-                    text = stringResource(R.string.cuisines), style = MaterialTheme.typography.headlineLarge,
+                    text = stringResource(R.string.cuisines),
+                    style = MaterialTheme.typography.headlineLarge,
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center
                 )
                 LazyRow(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .wrapContentHeight(),
-                    state = lazyListState
+                        .wrapContentHeight(), state = lazyListState
                 ) {
                     items(uiState.cuisine) {
                         CuisineCard(
-                            cuisine = it,
-                            onCuisineClick = onCuisineClick
+                            cuisine = it, onCuisineClick = onCuisineClick
                         )
                     }
                 }
@@ -112,13 +109,14 @@ fun HomeScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        stringResource(R.string.top_3_dishes), style = MaterialTheme.typography.headlineLarge,
+                        stringResource(R.string.top_3_dishes),
+                        style = MaterialTheme.typography.headlineLarge,
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center
                     )
 
-                    if(!uiState.isTopItemsLoading){
-                        uiState.topItems.forEach {menuItem ->
+                    if (!uiState.isTopItemsLoading) {
+                        uiState.topItems.forEach { menuItem ->
                             val item = uiState.cart.find { it.item.id == menuItem.id }
                             DishItem(
                                 modifier = Modifier.fillMaxWidth(0.9f),
@@ -128,7 +126,7 @@ fun HomeScreen(
                                 currentCountInCart = item?.quantity ?: 0
                             )
                         }
-                    }else {
+                    } else {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -148,7 +146,7 @@ fun HomeScreen(
 fun CuisineCard(
     modifier: Modifier = Modifier,
     cuisine: Cuisine,
-    onCuisineClick: (String, String) -> Unit = {id, name -> }
+    onCuisineClick: (String, String) -> Unit = { id, name -> }
 ) {
     Card(
         modifier = modifier

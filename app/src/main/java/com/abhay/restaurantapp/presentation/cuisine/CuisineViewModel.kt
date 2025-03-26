@@ -3,9 +3,9 @@ package com.abhay.restaurantapp.presentation.cuisine
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.abhay.restaurantapp.data.api.MenuItem
-import com.abhay.restaurantapp.domain.CartItem
-import com.abhay.restaurantapp.domain.FoodRepository
+import com.abhay.restaurantapp.data.api.dto.MenuItem
+import com.abhay.restaurantapp.domain.model.CartItem
+import com.abhay.restaurantapp.domain.repository.FoodRepository
 import com.abhay.restaurantapp.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -24,7 +24,7 @@ class CuisineViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(UiState())
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
-    fun initializeViewModel(cuisineId: String,cuisineName: String, cart: List<CartItem>) {
+    fun initializeViewModel(cuisineId: String, cuisineName: String, cart: List<CartItem>) {
         getItemList(cuisineId, cuisineName)
         _uiState.update { it.copy(cart = cart) }
     }
@@ -37,12 +37,13 @@ class CuisineViewModel @Inject constructor(
                 is Resource.Success -> {
                     _uiState.update {
                         it.copy(
-                            cuisineItems = resource.data?.cuisines?.find { it.cuisineId == cuisineId }?.items ?: emptyList(),
-                            isLoading = false
+                            cuisineItems = resource.data?.cuisines?.find { it.cuisineId == cuisineId }?.items
+                                ?: emptyList(), isLoading = false
                         )
                     }
                     Log.d("CuisineViewModel", "getItemList: ${uiState.value}")
                 }
+
                 is Resource.Error -> {
                     _uiState.update { it.copy(error = resource.message, isLoading = false) }
                 }

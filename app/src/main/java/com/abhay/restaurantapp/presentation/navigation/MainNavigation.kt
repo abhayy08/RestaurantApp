@@ -30,9 +30,10 @@ import kotlinx.serialization.Serializable
 fun MainNavigation(
     navController: NavHostController,
     paddingValues: PaddingValues,
-    onShowSnackbar: (String) -> Unit = { message -> }
+    onShowSnackbar: (String) -> Unit = { message -> },
+    homeViewModel: HomeViewModel
 ) {
-    val homeViewModel = hiltViewModel<HomeViewModel>()
+
     val cartItems = homeViewModel.uiState.collectAsState().value.cart
     NavHost(
         navController = navController,
@@ -42,30 +43,24 @@ fun MainNavigation(
             .padding(paddingValues),
         enterTransition = {
             slideInHorizontally(
-                initialOffsetX = { it },
-                animationSpec = tween(500)
+                initialOffsetX = { it }, animationSpec = tween(500)
             )
         },
         exitTransition = {
             slideOutHorizontally(
-                targetOffsetX = { -it },
-                animationSpec = tween(500)
+                targetOffsetX = { -it }, animationSpec = tween(500)
             )
         },
         popEnterTransition = {
             slideInHorizontally(
-                initialOffsetX = { -it },
-                animationSpec = tween(500)
+                initialOffsetX = { -it }, animationSpec = tween(500)
             )
         },
         popExitTransition = {
             slideOutHorizontally(
-                targetOffsetX = { it },
-                animationSpec = tween(500)
+                targetOffsetX = { it }, animationSpec = tween(500)
             )
-        }
-    )
-    {
+        }) {
         composable<Home> {
             val state = homeViewModel.uiState.collectAsState().value
             HomeScreen(
@@ -73,8 +68,7 @@ fun MainNavigation(
                 onCuisineClick = { id, name ->
                     navController.navigate(
                         Cuisine(
-                            id = id,
-                            cuisineName = name
+                            id = id, cuisineName = name
                         )
                     )
                 },
@@ -86,45 +80,30 @@ fun MainNavigation(
                 },
                 onShowSnackbar = onShowSnackbar,
                 clearError = { homeViewModel.clearError() },
-                getMoreCuisines = { homeViewModel.getMoreCuisines() }
-            )
+                getMoreCuisines = { homeViewModel.getMoreCuisines() })
         }
 
         composable<Cuisine> {
             val args = it.toRoute<Cuisine>()
             val viewModel = hiltViewModel<CuisineViewModel>()
-            viewModel.initializeViewModel(args.id, args.cuisineName ,cartItems)
+            viewModel.initializeViewModel(args.id, args.cuisineName, cartItems)
             val state = viewModel.uiState.collectAsState().value
 
-            CuisineScreen(
-                state = state,
-                onAddItem = {
-                    homeViewModel.addItemToCart(it, args.id)
-                },
-                onRemoveItem = {
-                    homeViewModel.removeItemFromCart(it)
-                },
-                onShowSnackbar = onShowSnackbar,
-                clearError = { viewModel.clearError() }
-            )
+            CuisineScreen(state = state, onAddItem = {
+                homeViewModel.addItemToCart(it, args.id)
+            }, onRemoveItem = {
+                homeViewModel.removeItemFromCart(it)
+            }, onShowSnackbar = onShowSnackbar, clearError = { viewModel.clearError() })
         }
 
         composable<Menu> {
-            MenuScreen(
-                cart = cartItems,
-                onAddItem = {
-                    homeViewModel.addItemToCart(it.item, it.cuisineId)
-                },
-                onRemoveItem = {
-                    homeViewModel.removeItemFromCart(it.item)
-                },
-                onPopBack = {
-                    navController.popBackStack()
-                },
-                onProceedToCheckout = {
-                    navController.navigate(CheckOut)
-                }
-            )
+            MenuScreen(cart = cartItems, onAddItem = {
+                homeViewModel.addItemToCart(it.item, it.cuisineId)
+            }, onRemoveItem = {
+                homeViewModel.removeItemFromCart(it.item)
+            }, onProceedToCheckout = {
+                navController.navigate(CheckOut)
+            })
         }
 
         composable<CheckOut> {
@@ -132,35 +111,25 @@ fun MainNavigation(
             viewModel.initializeCart(cartItems)
             val cartState = viewModel.cartState.collectAsState().value
 
-            CheckoutScreen(
-                cartState = cartState,
-                onCheckOut = {
-                    viewModel.checkout(
-                        openDialog = { transactionId, message ->
-                            navController.navigate(Dialog(transactionId, message))
-                        }
-                    )
-                },
-                onShowSnackbar = onShowSnackbar,
-                clearError = { viewModel.clearError() }
-            )
+            CheckoutScreen(cartState = cartState, onCheckOut = {
+                viewModel.checkout(
+                    openDialog = { transactionId, message ->
+                        navController.navigate(Dialog(transactionId, message))
+                    })
+            }, onShowSnackbar = onShowSnackbar, clearError = { viewModel.clearError() })
         }
-
 
         dialog<Dialog>(
             dialogProperties = DialogProperties(
-                dismissOnBackPress = false,
-                dismissOnClickOutside = false
+                dismissOnBackPress = false, dismissOnClickOutside = false
             )
         ) {
             val args = it.toRoute<Dialog>()
             DialogBox(
-                transactionId = args.transactionId,
-                message = args.message,
-                popBackStack = {
+                transactionId = args.transactionId, message = args.message, popBackStack = {
+                    homeViewModel.clearCart()
                     navController.popBackStack(Home, false)
-                }
-            )
+                })
         }
 
     }

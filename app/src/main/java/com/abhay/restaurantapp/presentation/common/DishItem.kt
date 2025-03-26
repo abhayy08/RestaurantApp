@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.abhay.restaurantapp.R
-import com.abhay.restaurantapp.data.api.MenuItem
+import com.abhay.restaurantapp.data.api.dto.MenuItem
 
 @Composable
 fun DishItem(

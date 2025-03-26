@@ -2,7 +2,7 @@ package com.abhay.restaurantapp.di
 
 import com.abhay.restaurantapp.data.api.FoodServiceApi
 import com.abhay.restaurantapp.data.repository.FoodRepositoryImpl
-import com.abhay.restaurantapp.domain.FoodRepository
+import com.abhay.restaurantapp.domain.repository.FoodRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

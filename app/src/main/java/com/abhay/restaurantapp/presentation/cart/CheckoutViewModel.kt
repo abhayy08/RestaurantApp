@@ -3,9 +3,9 @@ package com.abhay.restaurantapp.presentation.cart
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.abhay.restaurantapp.data.api.PaymentItem
-import com.abhay.restaurantapp.domain.CartItem
-import com.abhay.restaurantapp.domain.FoodRepository
+import com.abhay.restaurantapp.data.api.dto.PaymentItem
+import com.abhay.restaurantapp.domain.model.CartItem
+import com.abhay.restaurantapp.domain.repository.FoodRepository
 import com.abhay.restaurantapp.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
 
 @HiltViewModel
 class CheckoutViewModel @Inject constructor(

@@ -2,14 +2,14 @@ package com.abhay.restaurantapp.data.repository
 
 import android.util.Log
 import com.abhay.restaurantapp.data.api.FoodServiceApi
-import com.abhay.restaurantapp.data.api.ItemDetailResponse
-import com.abhay.restaurantapp.data.api.ItemFilterRequest
-import com.abhay.restaurantapp.data.api.ItemListResponse
-import com.abhay.restaurantapp.data.api.PaymentItem
-import com.abhay.restaurantapp.data.api.PaymentRequest
-import com.abhay.restaurantapp.data.api.PaymentResponse
-import com.abhay.restaurantapp.data.api.PriceRange
-import com.abhay.restaurantapp.domain.FoodRepository
+import com.abhay.restaurantapp.data.api.dto.ItemDetailResponse
+import com.abhay.restaurantapp.data.api.dto.ItemFilterRequest
+import com.abhay.restaurantapp.data.api.dto.ItemListResponse
+import com.abhay.restaurantapp.data.api.dto.PaymentItem
+import com.abhay.restaurantapp.data.api.dto.PaymentRequest
+import com.abhay.restaurantapp.data.api.dto.PaymentResponse
+import com.abhay.restaurantapp.data.api.dto.PriceRange
+import com.abhay.restaurantapp.domain.repository.FoodRepository
 import com.abhay.restaurantapp.utils.Resource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

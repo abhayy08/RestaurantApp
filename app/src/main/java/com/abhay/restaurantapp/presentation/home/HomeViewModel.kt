@@ -3,10 +3,10 @@ package com.abhay.restaurantapp.presentation.home
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.abhay.restaurantapp.data.api.Cuisine
-import com.abhay.restaurantapp.data.api.MenuItem
-import com.abhay.restaurantapp.domain.CartItem
-import com.abhay.restaurantapp.domain.FoodRepository
+import com.abhay.restaurantapp.data.api.dto.Cuisine
+import com.abhay.restaurantapp.data.api.dto.MenuItem
+import com.abhay.restaurantapp.domain.model.CartItem
+import com.abhay.restaurantapp.domain.repository.FoodRepository
 import com.abhay.restaurantapp.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -174,6 +175,10 @@ class HomeViewModel @Inject constructor(
             }
             _uiState.update { it.copy(cart = currentCart) }
         }
+    }
+
+    fun clearCart() {
+        _uiState.update { it.copy(cart = emptyList()) }
     }
 
     fun clearError() {

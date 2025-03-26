@@ -23,11 +23,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.abhay.restaurantapp.R
-import com.abhay.restaurantapp.domain.CartItem
+import com.abhay.restaurantapp.domain.model.CartItem
 
 @Composable
 fun CheckoutScreen(
-    cartState: CartState, onCheckOut: () -> Unit,
+    cartState: CartState,
+    onCheckOut: () -> Unit,
     onShowSnackbar: (String) -> Unit,
     clearError: () -> Unit
 ) {

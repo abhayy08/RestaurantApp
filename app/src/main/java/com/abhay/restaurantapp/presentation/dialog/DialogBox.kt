@@ -39,7 +39,7 @@ fun DialogBox(
     var showMessage by remember { mutableStateOf(false) }
 
     LaunchedEffect(key1 = Unit) {
-        delay(200)
+        delay(300)
         showMessage = true
         showThumbsUp = true
         delay(4000)
