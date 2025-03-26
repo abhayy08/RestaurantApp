@@ -1,5 +1,8 @@
 package com.abhay.restaurantapp.presentation.navigation
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -35,7 +38,19 @@ fun MainNavigation(
         startDestination = Home,
         modifier = Modifier
             .fillMaxSize()
-            .padding(paddValues)
+            .padding(paddValues),
+        enterTransition = {
+            slideInHorizontally(
+                initialOffsetX = { it },
+                animationSpec = tween(500)
+            )
+        },
+        exitTransition = {
+            slideOutHorizontally(
+                targetOffsetX = { it },
+                animationSpec = tween(500)
+            )
+        }
     ) {
         composable<Home> {
             val state = homeViewModel.uiState.collectAsState().value
