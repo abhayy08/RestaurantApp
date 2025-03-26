@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
@@ -45,7 +47,9 @@ fun CheckoutScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(8.dp),
+                .verticalScroll(rememberScrollState())
+                .padding(8.dp)
+                .padding(bottom = 65.dp),
         ) {
             cartState.items.forEach { item ->
                 CheckoutItem(
