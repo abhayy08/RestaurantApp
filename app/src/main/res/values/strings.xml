@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">RestaurantApp</string>
+    <string name="add_item_to_cart">Add Item To Cart</string>
+    <string name="top_3_dishes">Top 3 Dishes</string>
+    <string name="cart_is_empty">Cart is Empty!</string>
+    <string name="add_items_to_see_them_here">Add Items to see them here</string>
+    <string name="proceed_to_checkout">Proceed to Checkout</string>
+    <string name="order_now">Order Now</string>
+    <string name="total">Total</string>
+    <string name="unique_items">Unique Items:</string>
+</resources>
