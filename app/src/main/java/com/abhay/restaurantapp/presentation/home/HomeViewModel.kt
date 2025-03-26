@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.abhay.restaurantapp.data.api.dto.Cuisine
 import com.abhay.restaurantapp.data.api.dto.MenuItem
+import com.abhay.restaurantapp.data.api.dto.toMenuItem
 import com.abhay.restaurantapp.domain.model.CartItem
 import com.abhay.restaurantapp.domain.repository.FoodRepository
 import com.abhay.restaurantapp.utils.Resource
@@ -129,13 +130,7 @@ class HomeViewModel @Inject constructor(
                 is Resource.Success<*> -> {
                     resource.data?.let { itemDetail ->
                         resultList.add(
-                            MenuItem(
-                                id = itemDetail.itemId,
-                                name = itemDetail.itemName,
-                                imageUrl = itemDetail.itemImageUrl,
-                                price = itemDetail.itemPrice.toString(),
-                                rating = itemDetail.itemRating.toString()
-                            )
+                            itemDetail.toMenuItem()
                         )
                     }
                 }

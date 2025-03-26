@@ -15,3 +15,14 @@ data class ItemDetailResponse(
     @SerializedName("item_rating") val itemRating: Double,
     @SerializedName("item_image_url") val itemImageUrl: String
 )
+
+fun ItemDetailResponse.toMenuItem(): MenuItem {
+    return MenuItem(
+        id = this.itemId,
+        name = this.itemName,
+        imageUrl = this.itemImageUrl,
+        price = this.itemPrice.toString(),
+        rating = this.itemRating.toString()
+    )
+}
+

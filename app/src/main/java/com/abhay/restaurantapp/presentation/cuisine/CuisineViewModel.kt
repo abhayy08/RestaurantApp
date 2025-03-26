@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.abhay.restaurantapp.data.api.dto.MenuItem
+import com.abhay.restaurantapp.data.api.dto.toMenuItem
 import com.abhay.restaurantapp.domain.model.CartItem
 import com.abhay.restaurantapp.domain.repository.FoodRepository
 import com.abhay.restaurantapp.utils.Resource
@@ -30,17 +31,23 @@ class CuisineViewModel @Inject constructor(
     }
 
     fun getItemList(cuisineId: String, cuisineName: String) {
+        if (_uiState.value.cuisineItems.isNotEmpty()) return
+
         _uiState.value = _uiState.value.copy(isLoading = true)
         viewModelScope.launch(Dispatchers.IO) {
             val resource = foodRepository.getItemByFilter(listOf(cuisineName), null, null)
             when (resource) {
                 is Resource.Success -> {
-                    _uiState.update {
-                        it.copy(
-                            cuisineItems = resource.data?.cuisines?.find { it.cuisineId == cuisineId }?.items
-                                ?: emptyList(), isLoading = false
-                        )
+                    val itemList = resource.data?.cuisines?.find { it.cuisineId == cuisineId }?.items ?: emptyList()
+
+                    val detailedItems = itemList.mapNotNull { item ->
+                        val itemDetail = foodRepository.getItemById(item.id.toInt())
+                        if (itemDetail is Resource.Success) {
+                            itemDetail.data?.toMenuItem()
+                        } else null
                     }
+
+                    _uiState.update { it.copy(cuisineItems = detailedItems, isLoading = false) }
                     Log.d("CuisineViewModel", "getItemList: ${uiState.value}")
                 }
 
@@ -50,6 +57,7 @@ class CuisineViewModel @Inject constructor(
             }
         }
     }
+
 
 
     fun clearError() {
