@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -44,12 +43,12 @@ import com.abhay.restaurantapp.presentation.common.DishItem
 @Composable
 fun HomeScreen(
     uiState: UiState = UiState(),
-    onCuisineClick: (String) -> Unit = {},
+    onCuisineClick: (String, String) -> Unit = {id, name -> },
     onAddItem: (MenuItem) -> Unit = {},
     onRemoveItem: (MenuItem) -> Unit = {},
     onShowSnackbar: (String) -> Unit = {},
     clearError: () -> Unit,
-    getMoreCuisine: () -> Unit
+    getMoreCuisines: () -> Unit
 ) {
 
     LaunchedEffect(uiState.error) {
@@ -66,7 +65,7 @@ fun HomeScreen(
 
     LaunchedEffect(isLastElementVisible) {
         if(isLastElementVisible) {
-            getMoreCuisine()
+            getMoreCuisines()
         }
     }
 
@@ -89,7 +88,11 @@ fun HomeScreen(
                     .padding(12.dp)
                     .verticalScroll(rememberScrollState()),
             ) {
-
+                Text(
+                    text = stringResource(R.string.cuisines), style = MaterialTheme.typography.headlineLarge,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
                 LazyRow(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -145,14 +148,14 @@ fun HomeScreen(
 fun CuisineCard(
     modifier: Modifier = Modifier,
     cuisine: Cuisine,
-    onCuisineClick: (String) -> Unit = {}
+    onCuisineClick: (String, String) -> Unit = {id, name -> }
 ) {
     Card(
         modifier = modifier
             .padding(6.dp)
             .width(500.dp)
             .height(200.dp)
-            .clickable { onCuisineClick(cuisine.cuisineId) },
+            .clickable { onCuisineClick(cuisine.cuisineId, cuisine.cuisineName) },
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Box(

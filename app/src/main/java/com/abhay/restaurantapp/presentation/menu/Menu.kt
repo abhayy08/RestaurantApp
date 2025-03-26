@@ -110,7 +110,7 @@ fun MenuItemCard(
                     modifier = Modifier.padding(4.dp)
                 ){
                     Text(text = item.item.name, style = MaterialTheme.typography.titleMedium)
-                    Text(text = item.item.price, color = Color.DarkGray)
+                    Text(text = item.item.price, color = Color.Gray)
                 }
             }
 

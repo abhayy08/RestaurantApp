@@ -13,7 +13,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -39,17 +38,23 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             val resource = foodRepository.getItemList(1, 10)
             page += 2
-            _uiState.update {
-                when (resource) {
-                    is Resource.Success<*> -> it.copy(
-                        cuisine = resource.data!!.cuisines,
-                        isLoading = false
-                    )
-                    is Resource.Error<*> -> it.copy(
-                        error = resource.message,
-                        isLoading = false
-                    )
+            when (resource) {
+                is Resource.Success<*> -> {
+                    _uiState.update {
+                        it.copy(
+                            cuisine = resource.data!!.cuisines, isLoading = false
+                        )
+                    }
                 }
+
+                is Resource.Error<*> -> {
+                    _uiState.update {
+                        it.copy(
+                            error = resource.message, isLoading = false
+                        )
+                    }
+                }
+
             }
             Log.d("HomeViewModel", "getItemList: ${uiState.value}")
         }
@@ -59,16 +64,25 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             val resource = foodRepository.getItemList(page, count)
             page += 2
-            _uiState.update {
-                when (resource) {
-                    is Resource.Success<*> -> it.copy(
-                        cuisine = it.cuisine + resource.data!!.cuisines
-                    )
-                    is Resource.Error<*> -> it.copy(
-                        error = resource.message
-                    )
+
+            when (resource) {
+                is Resource.Success<*> -> {
+                    _uiState.update {
+                        it.copy(
+                            cuisine = it.cuisine + resource.data!!.cuisines
+                        )
+                    }
+                }
+
+                is Resource.Error<*> -> {
+                    _uiState.update {
+                        it.copy(
+                            error = resource.message
+                        )
+                    }
                 }
             }
+
             Log.d("HomeViewModel", "getItemList: ${uiState.value}")
         }
     }
@@ -77,21 +91,26 @@ class HomeViewModel @Inject constructor(
         _uiState.update { it.copy(isTopItemsLoading = true) }
         viewModelScope.launch(Dispatchers.IO) {
             val resource = foodRepository.getItemByFilter(null, null, 4.0)
-            _uiState.update {
-                when (resource) {
-                    is Resource.Success<*> -> {
-                        val topItems = getTopItemsInDetail(resource.data!!.cuisines[0].items.take(3))
+            when (resource) {
+                is Resource.Success<*> -> {
+                    val topItems = getTopItemsInDetail(resource.data!!.cuisines[0].items.take(3))
+                    _uiState.update {
                         it.copy(
                             topItems = topItems,
                             cuisineIdofTopItems = resource.data.cuisines[0].cuisineId,
                             isTopItemsLoading = false
                         )
                     }
-                    is Resource.Error<*> -> it.copy(
-                        error = resource.message,
-                        isTopItemsLoading = false
-                    )
                 }
+
+                is Resource.Error<*> -> {
+                    _uiState.update {
+                        it.copy(
+                            error = resource.message, isTopItemsLoading = false
+                        )
+                    }
+                }
+
             }
             Log.d("HomeViewModel", "getTopItems:ItemList: ${uiState.value.topItems}")
         }
@@ -115,6 +134,7 @@ class HomeViewModel @Inject constructor(
                         )
                     }
                 }
+
                 is Resource.Error<*> -> {
                     _uiState.update { it.copy(error = resource.message) }
                 }
@@ -130,7 +150,8 @@ class HomeViewModel @Inject constructor(
         Log.d("HomeViewModel", "addItemToCart: $currentCart")
         if (existingCartItemIndex != -1) {
             val existingCartItem = currentCart[existingCartItemIndex]
-            currentCart[existingCartItemIndex] = existingCartItem.copy(quantity = existingCartItem.quantity + 1)
+            currentCart[existingCartItemIndex] =
+                existingCartItem.copy(quantity = existingCartItem.quantity + 1)
         } else {
             currentCart.add(CartItem(item = menuItem, cuisineId = cuisineId, quantity = 1))
         }
@@ -148,11 +169,13 @@ class HomeViewModel @Inject constructor(
             if (existingCartItem.quantity == 1) {
                 currentCart.removeAt(existingCartItemIndex)
             } else {
-                currentCart[existingCartItemIndex] = existingCartItem.copy(quantity = existingCartItem.quantity - 1)
+                currentCart[existingCartItemIndex] =
+                    existingCartItem.copy(quantity = existingCartItem.quantity - 1)
             }
             _uiState.update { it.copy(cart = currentCart) }
         }
     }
+
     fun clearError() {
         _uiState.update { it.copy(error = null) }
     }

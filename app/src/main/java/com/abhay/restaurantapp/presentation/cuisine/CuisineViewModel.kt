@@ -24,35 +24,32 @@ class CuisineViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(UiState())
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
-    fun initializeViewModel(cuisineId: String, cart: List<CartItem>) {
-        getItemList(cuisineId)
+    fun initializeViewModel(cuisineId: String,cuisineName: String, cart: List<CartItem>) {
+        getItemList(cuisineId, cuisineName)
         _uiState.update { it.copy(cart = cart) }
     }
 
-    fun getItemList(cuisineId: String) {
+    fun getItemList(cuisineId: String, cuisineName: String) {
         _uiState.value = _uiState.value.copy(isLoading = true)
         viewModelScope.launch(Dispatchers.IO) {
-            val resource = foodRepository.getItemList(1, 10)
+            val resource = foodRepository.getItemByFilter(listOf(cuisineName), null, null)
             when (resource) {
-                is Resource.Success<*> -> {
+                is Resource.Success -> {
                     _uiState.update {
                         it.copy(
-                            cuisineItems = resource.data!!.cuisines.find { it.cuisineId == cuisineId }!!.items,
+                            cuisineItems = resource.data?.cuisines?.find { it.cuisineId == cuisineId }?.items ?: emptyList(),
                             isLoading = false
                         )
                     }
                     Log.d("CuisineViewModel", "getItemList: ${uiState.value}")
                 }
-
-                is Resource.Error<*> -> {
+                is Resource.Error -> {
                     _uiState.update { it.copy(error = resource.message, isLoading = false) }
                 }
-
-                else -> {}
             }
         }
-
     }
+
 
     fun clearError() {
         _uiState.update { it.copy(error = null) }

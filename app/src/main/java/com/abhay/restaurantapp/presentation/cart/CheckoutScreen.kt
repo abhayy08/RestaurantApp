@@ -73,7 +73,7 @@ fun CheckoutScreen(
                     Text(
                         text = "₹${cartState.grandTotalAmount}",
                         style = MaterialTheme.typography.titleMedium,
-                        color = Color.DarkGray
+                        color = Color.White
                     )
                 }
             }

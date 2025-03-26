@@ -22,7 +22,6 @@ fun CuisineScreen(
     onRemoveItem: (MenuItem) -> Unit,
     onShowSnackbar: (String) -> Unit,
     clearError: () -> Unit,
-    getMoreItems: () -> Unit
 ) {
 
     LaunchedEffect(state.error) {
@@ -32,25 +31,13 @@ fun CuisineScreen(
         }
     }
 
-    val lazyListState = rememberLazyListState()
-    val isLastElementVisible = lazyListState.let {
-        derivedStateOf { it.layoutInfo.visibleItemsInfo.lastOrNull()?.index == it.layoutInfo.totalItemsCount - 1 }.value
-    }
-
-    LaunchedEffect(isLastElementVisible) {
-        if(isLastElementVisible) {
-            getMoreItems()
-        }
-    }
-
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(8.dp),
-            state = lazyListState
+            contentPadding = PaddingValues(8.dp)
         ) {
             items(state.cuisineItems) { menuItem ->
                 val item = state.cart?.find { it.item.id == menuItem.id }

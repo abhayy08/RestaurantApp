@@ -70,10 +70,11 @@ fun MainNavigation(
             val state = homeViewModel.uiState.collectAsState().value
             HomeScreen(
                 uiState = state,
-                onCuisineClick = {
+                onCuisineClick = { id, name ->
                     navController.navigate(
                         Cuisine(
-                            id = it
+                            id = id,
+                            cuisineName = name
                         )
                     )
                 },
@@ -85,14 +86,14 @@ fun MainNavigation(
                 },
                 onShowSnackbar = onShowSnackbar,
                 clearError = { homeViewModel.clearError() },
-                getMoreCuisine = { homeViewModel.getMoreCuisines() }
+                getMoreCuisines = { homeViewModel.getMoreCuisines() }
             )
         }
 
         composable<Cuisine> {
             val args = it.toRoute<Cuisine>()
             val viewModel = hiltViewModel<CuisineViewModel>()
-            viewModel.initializeViewModel(args.id, cartItems)
+            viewModel.initializeViewModel(args.id, args.cuisineName ,cartItems)
             val state = viewModel.uiState.collectAsState().value
 
             CuisineScreen(
@@ -104,8 +105,7 @@ fun MainNavigation(
                     homeViewModel.removeItemFromCart(it)
                 },
                 onShowSnackbar = onShowSnackbar,
-                clearError = { viewModel.clearError() },
-                getMoreItems = { viewModel.getItemList(args.id) }
+                clearError = { viewModel.clearError() }
             )
         }
 
@@ -170,7 +170,7 @@ fun MainNavigation(
 data object Home
 
 @Serializable
-data class Cuisine(val id: String)
+data class Cuisine(val id: String, val cuisineName: String)
 
 @Serializable
 data object Menu

@@ -54,7 +54,7 @@ fun RestaurantMainScreen(navController: NavHostController) {
     val navBackStackEntry = navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry.value?.destination?.route
     val currentScreenTitle =
-        currentDestination.toString().substringAfterLast('.').substringBeforeLast('/')
+        currentDestination.toString().substringAfterLast('.').substringBeforeLast('/').substringBeforeLast('/')
 
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -63,12 +63,12 @@ fun RestaurantMainScreen(navController: NavHostController) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
-            RestaurantTopAppBar(currentScreenTitle = if (currentScreenTitle.startsWith("Dialog")) "Checkout" else currentScreenTitle)
+            RestaurantTopAppBar(currentScreenTitle = currentScreenTitle)
         },
         floatingActionButton = {
             CartFab(
                 navController = navController,
-                isVisible = !(currentScreenTitle == "CheckOut" || currentScreenTitle == "Menu")
+                isVisible = !(currentScreenTitle == "CheckOut" || currentScreenTitle == "Menu" || currentScreenTitle == "Dialog")
             )
         },
         snackbarHost = {
