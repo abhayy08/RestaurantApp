@@ -26,6 +26,10 @@ class HomeViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(UiState())
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
+    private val _language = MutableStateFlow("en")
+    val language: StateFlow<String> = _language.asStateFlow()
+
+
     init {
         getItemList()
         getTopItems()
@@ -183,6 +187,14 @@ class HomeViewModel @Inject constructor(
 
     fun clearError() {
         _uiState.update { it.copy(error = null) }
+    }
+
+    fun toggleLanguage() {
+        if (_language.value == "en") {
+            _language.value = "hi"
+        } else {
+            _language.value = "en"
+        }
     }
 
 }

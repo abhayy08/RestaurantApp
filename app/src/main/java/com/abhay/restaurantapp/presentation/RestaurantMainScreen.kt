@@ -34,44 +34,35 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun RestaurantMainScreen(
-    navController: NavHostController,
-    homeViewModel: HomeViewModel
+    navController: NavHostController, homeViewModel: HomeViewModel, onLanguageChange: () -> Unit
 ) {
     val navBackStackEntry = navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry.value?.destination?.route
     val currentScreenTitle =
-        currentDestination.toString().substringAfterLast('.').substringBeforeLast('/').substringBeforeLast('/')
+        currentDestination.toString().substringAfterLast('.').substringBeforeLast('/')
+            .substringBeforeLast('/')
 
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
-    val isVisible = !(currentScreenTitle == "CheckOut" || currentScreenTitle == "Menu" || currentScreenTitle == "Dialog")
-            && homeViewModel.uiState.collectAsState().value.cart.isNotEmpty()
+    val isVisible =
+        !(currentScreenTitle == "CheckOut" || currentScreenTitle == "Menu" || currentScreenTitle == "Dialog") && homeViewModel.uiState.collectAsState().value.cart.isNotEmpty()
 
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        topBar = {
-            RestaurantTopAppBar(
-                currentScreenTitle = currentScreenTitle,
-                onLanguageChange = {
-//                    homeViewModel.toggleLanguage()
-                }
-            )
-        },
-        floatingActionButton = {
-            CartFab(
-                navController = navController,
-                isVisible = isVisible
-            )
-        },
-        snackbarHost = {
-            SnackbarHost(snackbarHostState)
-        }
-    ) { paddingValues ->
+    Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
+        RestaurantTopAppBar(
+            currentScreenTitle = currentScreenTitle, onLanguageChange = onLanguageChange
+        )
+    }, floatingActionButton = {
+        CartFab(
+            navController = navController, isVisible = isVisible
+        )
+    }, snackbarHost = {
+        SnackbarHost(snackbarHostState)
+    }) { paddingValues ->
         MainNavigation(
             navController = navController,
             paddingValues = paddingValues,
-            onShowSnackbar = {message ->
+            onShowSnackbar = { message ->
                 scope.launch { snackbarHostState.showSnackbar(message) }
             },
             homeViewModel = homeViewModel
@@ -81,20 +72,15 @@ fun RestaurantMainScreen(
 
 @Composable
 fun CartFab(
-    navController: NavController,
-    isVisible: Boolean = true
+    navController: NavController, isVisible: Boolean = true
 ) {
     AnimatedVisibility(
-        visible = isVisible,
-        enter = slideInHorizontally(
-            initialOffsetX = { it },
-            animationSpec = tween(
+        visible = isVisible, enter = slideInHorizontally(
+            initialOffsetX = { it }, animationSpec = tween(
                 durationMillis = 500
             )
-        ),
-        exit = slideOutHorizontally(
-            targetOffsetX = { it },
-            animationSpec = tween(
+        ), exit = slideOutHorizontally(
+            targetOffsetX = { it }, animationSpec = tween(
                 durationMillis = 500
             )
         )
@@ -102,8 +88,7 @@ fun CartFab(
         FloatingActionButton(
             onClick = {
                 navController.navigate(Menu)
-            }
-        ) {
+            }) {
             Icon(Icons.Rounded.ShoppingCart, contentDescription = "Cart")
         }
     }
@@ -112,8 +97,7 @@ fun CartFab(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RestaurantTopAppBar(
-    currentScreenTitle: String,
-    onLanguageChange: () -> Unit
+    currentScreenTitle: String, onLanguageChange: () -> Unit
 ) {
     TopAppBar(
         title = { Text(currentScreenTitle, style = MaterialTheme.typography.headlineLarge) },
@@ -125,10 +109,8 @@ fun RestaurantTopAppBar(
                 onClick = onLanguageChange
             ) {
                 Icon(
-                    imageVector = Icons.Rounded.Language,
-                    contentDescription = "Change Language"
+                    imageVector = Icons.Rounded.Language, contentDescription = "Change Language"
                 )
             }
-        }
-    )
+        })
 }
